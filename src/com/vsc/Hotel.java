@@ -3,6 +3,7 @@ package com.vsc;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Scanner;
@@ -41,11 +42,19 @@ public class Hotel {
                 String startDate = input.next();
                 System.out.println("Reservation ending on: (dd/MM/yyyy)");
                 String endDate = input.next();
-                System.out.println("Name of the person reserving the room.");
-                String[] reservationInfo = {roomNumber, startDate, endDate};
-                addElementTo2dArray(reservations, reservationInfo);
-
+                System.out.println("Name of the person reserving the room:");
+                String customer = input.next();
+                String[] reservationInfo = {roomNumber, startDate, endDate, customer};
+                if (!checkIfReservationIsValid(reservations, reservationInfo)) {
+                    System.out.println("Error: invalid reservation info.");
+                } else {
+                    reservations = addElementTo2dArray(reservations, reservationInfo);
+                    System.out.println("Registration successful!");
+                }
                 break;
+        }
+        for (int i = 0; i< reservations.length; i++) {
+            System.out.println(Arrays.toString(reservations[i]));
         }
     }
 
@@ -54,8 +63,21 @@ public class Hotel {
         return format1.parse(input);
     }
 
-    public static void checkIfReservationIsValid (Scanner input) throws ParseException {
-        ...
+    public static boolean checkIfReservationIsValid(String[][] allReservations, String[] checkedInfo) throws ParseException {
+        Date minDate = convertInputToDate(checkedInfo[1]);
+        Date maxDate = convertInputToDate(checkedInfo[2]);
+        int flag = 0;
+        for (String[] Reservation : allReservations) {
+            if (Reservation[0].equals(checkedInfo[0]) &&
+                    !checkIfTargetIsBetweenTwoDates(minDate, maxDate, convertInputToDate(Reservation[1])) &&
+                    !checkIfTargetIsBetweenTwoDates(minDate, maxDate, convertInputToDate(Reservation[2])) &&
+                    !checkIfTargetIsBetweenTwoDates(convertInputToDate(Reservation[1]), convertInputToDate(Reservation[2]), minDate) &&
+                    !checkIfTargetIsBetweenTwoDates(convertInputToDate(Reservation[1]), convertInputToDate(Reservation[2]), maxDate)
+            ) {
+                flag = 1;
+            }
+        }
+        return flag == 0;
     }
 
     public static boolean checkIfTargetIsBetweenTwoDates(Date min, Date max, Date target) {
@@ -64,8 +86,8 @@ public class Hotel {
 
     public static String[][] addElementTo2dArray(String[][] baseArray, String[] elementArray) {
         String[][] newArray = new String[baseArray.length + 1][];
-        for(int i = 0; i<baseArray.length; i++){
-            newArray[i] = baseArray [i];
+        for (int i = 0; i < baseArray.length; i++) {
+            newArray[i] = baseArray[i];
         }
         newArray[baseArray.length] = elementArray;
         return newArray;

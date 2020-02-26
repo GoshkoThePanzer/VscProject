@@ -19,70 +19,55 @@ public class Hotel {
         //the other rooms have a sight to the hotel's pool and garden
         //pool card, breakfast, baby bed, etc. are ordered independently for each room.
         int[] roomNumbers = new int[20];
-        for(int i = 1; i<=20; i++){
-            roomNumbers[i-1] = i;
+        for (int i = 1; i <= 20; i++) {
+            roomNumbers[i - 1] = i;
         }
-        int[] hotelCapacityOfRooms = {
-                1, 1, 1, 1, 1, 1, 1, 1,
-                2, 2, 2, 2, 2, 2, 2,
-                4, 3, 3, 3, 4
-        };
-        int[] hotelReservedRooms = new int[20];
-        String[] roomComments = new String[20];
+        String[][] reservations = {};
+        Date today = Calendar.getInstance().getTime();
+        Scanner input = new Scanner(System.in);
 
-        Scanner input = new Scanner (System.in);
-        System.out.println("Give me date");
-        String date = input.next();
-        System.out.println(convertInputToDate(date));
 
-        Calendar c = new Calendar() {
-            @Override
-            protected void computeTime() {
+        System.out.println("Welcome to our hotel!");
+        System.out.println("Please select one of the following options:");
+        System.out.println("1. Make a room reservation            2. Check free rooms today ");
+        System.out.println("3. Cancel a reservation/Free a room   4. Get a report of all reservations in a period");
+        System.out.println("5. Find a suitable room in a period.  6. Bonus ---");
+        byte option = input.nextByte();
+        switch (option) {
+            case 1:
+                System.out.println("Enter room number:");
+                String roomNumber = input.next();
+                System.out.println("Reservation starting on: (dd/MM/yyyy)");
+                String startDate = input.next();
+                System.out.println("Reservation ending on: (dd/MM/yyyy)");
+                String endDate = input.next();
+                System.out.println("Name of the person reserving the room.");
+                String[] reservationInfo = {roomNumber, startDate, endDate};
+                addElementTo2dArray(reservations, reservationInfo);
 
-            }
-
-            @Override
-            protected void computeFields() {
-
-            }
-
-            @Override
-            public void add(int i, int i1) {
-
-            }
-
-            @Override
-            public void roll(int i, boolean b) {
-
-            }
-
-            @Override
-            public int getMinimum(int i) {
-                return 0;
-            }
-
-            @Override
-            public int getMaximum(int i) {
-                return 0;
-            }
-
-            @Override
-            public int getGreatestMinimum(int i) {
-                return 0;
-            }
-
-            @Override
-            public int getLeastMaximum(int i) {
-                return 0;
-            }
-        };
-
+                break;
+        }
     }
+
     public static Date convertInputToDate(String input) throws ParseException {
-        SimpleDateFormat format1=new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat format1 = new SimpleDateFormat("dd/MM/yyyy");
         return format1.parse(input);
     }
-    public static boolean checkIfTargetIsBetweenTwoDates (Date min, Date max, Date target){
+
+    public static void checkIfReservationIsValid (Scanner input) throws ParseException {
+        ...
+    }
+
+    public static boolean checkIfTargetIsBetweenTwoDates(Date min, Date max, Date target) {
         return target.after(min) && target.before(max);
+    }
+
+    public static String[][] addElementTo2dArray(String[][] baseArray, String[] elementArray) {
+        String[][] newArray = new String[baseArray.length + 1][];
+        for(int i = 0; i<baseArray.length; i++){
+            newArray[i] = baseArray [i];
+        }
+        newArray[baseArray.length] = elementArray;
+        return newArray;
     }
 }

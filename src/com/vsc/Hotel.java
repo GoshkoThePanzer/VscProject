@@ -20,10 +20,6 @@ public class Hotel {
         //the other rooms have a sight to the hotel's pool and garden
         //pool card, breakfast, baby bed, etc. are ordered independently for each room.
 
-        int[] roomNumbers = new int[20];
-        for (int i = 1; i <= 20; i++) {
-            roomNumbers[i - 1] = i;
-        }
         String[][] reservations = {};
         Date today = Calendar.getInstance().getTime();
         Scanner input = new Scanner(System.in);
@@ -31,9 +27,9 @@ public class Hotel {
         System.out.println("Welcome to our hotel!");
         System.out.println("Please select one of the following options:");
         while (true) {
-        System.out.println("\n" + "1. Make a room reservation            2. Check free rooms today ");
-        System.out.println("3. Cancel a reservation/Free a room   4. Get a report of all reservations in a period");
-        System.out.println("5. Find a suitable room in a period.  6. Exit");
+            System.out.println("\n" + "1. Make a room reservation            2. Check free rooms today ");
+            System.out.println("3. Cancel a reservation/Free a room   4. Get a report of all reservations in a period");
+            System.out.println("5. Find a suitable room in a period.  6. Exit");
 
             byte option = input.nextByte();
             switch (option) {
@@ -56,7 +52,10 @@ public class Hotel {
                     break;
 
                 case 2:
-                    int[] availableRooms = roomNumbers;
+                    int[] availableRooms = new int[20];
+                    for (int i = 1; i <= 20; i++) {
+                        availableRooms[i - 1] = i;
+                    }
                     for (String[] reservation : reservations) {
                         int roomOfReservation = Integer.parseInt(reservation[0]);
                         if (checkIfTargetIsBetweenTwoDates(convertInputToDate(reservation[1]), convertInputToDate(reservation[2]), today)) {
@@ -77,10 +76,9 @@ public class Hotel {
                     roomNumber = input.next();
                     System.out.println("Start date of the reservation:");
                     startDate = input.next();
-
                     int flag = 0;
-                    for(String[] reservation: reservations) {
-                        if( roomNumber.equals(reservation[0]) && customer.equals(reservation[3]) && startDate.equals(reservation[1])){
+                    for (String[] reservation : reservations) {
+                        if (roomNumber.equals(reservation[0]) && customer.equals(reservation[3]) && startDate.equals(reservation[1])) {
                             flag++;
                             reservations = deleteElementOf2dArray(reservations, reservation);
                         }
@@ -89,6 +87,21 @@ public class Hotel {
                         System.out.println("Error. Such registration was not found.");
                     }
                     break;
+
+                case 4:
+                    System.out.println("Enter the first date of the period:");
+                    Date firstDate = convertInputToDate(input.next());
+                    System.out.println("Enter the last date of the period:");
+                    Date lastDate = convertInputToDate(input.next());
+                    for (String[] reservation : reservations) {
+                        if (checkIfTargetIsBetweenTwoDates(firstDate, lastDate, convertInputToDate(reservation[1])) ||
+                        checkIfTargetIsBetweenTwoDates(firstDate, lastDate, convertInputToDate(reservation[2]))) {
+                            System.out.println(String.format("Room: %s, Reservation days: %s - %s, on the name: %s",
+                                    reservation[0], reservation[1], reservation[2], reservation[3]));
+                        }
+                    }
+                    break;
+
                 case 6:
                     System.exit(0);
             }

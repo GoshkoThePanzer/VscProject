@@ -28,13 +28,13 @@ public class Hotel {
         Date today = Calendar.getInstance().getTime();
         Scanner input = new Scanner(System.in);
 
-        System.out.println("\n" + "Welcome to our hotel!");
+        System.out.println("Welcome to our hotel!");
         System.out.println("Please select one of the following options:");
-        System.out.println("1. Make a room reservation            2. Check free rooms today ");
+        while (true) {
+        System.out.println("\n" + "1. Make a room reservation            2. Check free rooms today ");
         System.out.println("3. Cancel a reservation/Free a room   4. Get a report of all reservations in a period");
         System.out.println("5. Find a suitable room in a period.  6. Exit");
 
-        while (true) {
             byte option = input.nextByte();
             switch (option) {
                 case 1:
@@ -70,6 +70,25 @@ public class Hotel {
                     System.out.println(availableRooms[availableRooms.length - 1] + ".");
                     break;
 
+                case 3:
+                    System.out.println("Enter your name:");
+                    customer = input.next();
+                    System.out.println("Enter number of the room:");
+                    roomNumber = input.next();
+                    System.out.println("Start date of the reservation:");
+                    startDate = input.next();
+
+                    int flag = 0;
+                    for(String[] reservation: reservations) {
+                        if( roomNumber.equals(reservation[0]) && customer.equals(reservation[3]) && startDate.equals(reservation[1])){
+                            flag++;
+                            reservations = deleteElementOf2dArray(reservations, reservation);
+                        }
+                    }
+                    if (flag == 0) {
+                        System.out.println("Error. Such registration was not found.");
+                    }
+                    break;
                 case 6:
                     System.exit(0);
             }
@@ -143,8 +162,8 @@ public class Hotel {
         return newArray;
     }
 
-    public static int[][] deleteElementOf2dArray(int[][] baseArray, int[] toDelete) {
-        int[][] newArray = new int[baseArray.length - 1][];
+    public static String[][] deleteElementOf2dArray(String[][] baseArray, String[] toDelete) {
+        String[][] newArray = new String[baseArray.length - 1][];
         int index = 0;
         for (int i = 0; i < baseArray.length; i++) {
             if (baseArray[i] == toDelete) {

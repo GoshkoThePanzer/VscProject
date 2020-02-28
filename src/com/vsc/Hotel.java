@@ -1,6 +1,5 @@
 package com.vsc;
 
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -9,6 +8,8 @@ import java.util.Date;
 import java.util.Scanner;
 
 public class Hotel {
+
+    static String[][] reservations = RegistrationsClass.reservationsCopy;
 
     public static void main(String[] args) throws ParseException {
         //           SCHEME OF HOTEL
@@ -19,8 +20,11 @@ public class Hotel {
         //the last two rooms of each floor have a sight to the sea
         //the other rooms have a sight to the hotel's pool and garden
         //pool card, breakfast, baby bed, etc. are ordered independently for each room.
+        int[] roomNumbers = new int[20];
+        for (int i = 1; i <= 20; i++) {
+            roomNumbers[i - 1] = i;
+        }
 
-        String[][] reservations = {};
         Date today = Calendar.getInstance().getTime();
         Scanner input = new Scanner(System.in);
 
@@ -41,7 +45,7 @@ public class Hotel {
                     System.out.println("Reservation ending on: (dd/MM/yyyy)");
                     String endDate = input.next();
                     System.out.println("Name of the person reserving the room:");
-                    String customer = input.next();
+                    String customer = input.next(); /////// !!!!!!!!!!!!!!!!!!!
                     String[] reservationInfo = {roomNumber, startDate, endDate, customer};
                     if (!checkIfReservationIsValid(reservations, reservationInfo, today)) {
                         System.out.println("Invalid registration info. Please try again.");
@@ -52,16 +56,7 @@ public class Hotel {
                     break;
 
                 case 2:
-                    int[] availableRooms = new int[20];
-                    for (int i = 1; i <= 20; i++) {
-                        availableRooms[i - 1] = i;
-                    }
-                    for (String[] reservation : reservations) {
-                        int roomOfReservation = Integer.parseInt(reservation[0]);
-                        if (checkIfTargetIsBetweenTwoDates(convertInputToDate(reservation[1]), convertInputToDate(reservation[2]), today)) {
-                            availableRooms = deleteElementOfArray(availableRooms, roomOfReservation);
-                        }
-                    }
+                    int[] availableRooms = findAvailableRooms(roomNumbers, today);
                     System.out.print("Available rooms today: ");
                     for (int i = 0; i < availableRooms.length - 1; i++) {
                         System.out.print(availableRooms[i] + ", ");
@@ -71,7 +66,7 @@ public class Hotel {
 
                 case 3:
                     System.out.println("Enter your name:");
-                    customer = input.next();
+                    customer = input.next(); /////////////!!!!!!!!!!!!!!!!
                     System.out.println("Enter number of the room:");
                     roomNumber = input.next();
                     System.out.println("Start date of the reservation:");
@@ -95,21 +90,48 @@ public class Hotel {
                     Date lastDate = convertInputToDate(input.next());
                     for (String[] reservation : reservations) {
                         if (checkIfTargetIsBetweenTwoDates(firstDate, lastDate, convertInputToDate(reservation[1])) ||
-                        checkIfTargetIsBetweenTwoDates(firstDate, lastDate, convertInputToDate(reservation[2]))) {
+                                checkIfTargetIsBetweenTwoDates(firstDate, lastDate, convertInputToDate(reservation[2]))) {
                             System.out.println(String.format("Room: %s, Reservation days: %s - %s, on the name: %s",
                                     reservation[0], reservation[1], reservation[2], reservation[3]));
                         }
                     }
                     break;
 
+                case 5:
+                    int[] matchingRooms = new int[0];
+                    System.out.println("Enter date for the search:");
+                    Date date = convertInputToDate(input.next());
+                    System.out.println("Enter needed capacity of the room (max capacity: 4)");
+                    int requiredCapacity = input.nextInt();
+                    for (int room: findAvailableRooms(roomNumbers, date)){
+                        if(findCapacityOfARoom(room) >= requiredCapacity){
+                            matchingRooms = addElementToArray(matchingRooms, room);
+                        }
+                    }
+                    if (matchingRooms.length == 0){
+                        System.out.println("No such rooms available.");
+                    } else {
+                        System.out.println("Matching rooms: " + printsAllElementsOfArray(matchingRooms));
+                    }
+                    break;
+
                 case 6:
                     System.exit(0);
             }
-            for (String[] reservation : reservations) {
+            RegistrationsClass.reservationsCopy = reservations;
+            for (String[] reservation : RegistrationsClass.reservationsCopy) {
                 System.out.println(Arrays.toString(reservation));
             }
         }
     }
+
+
+
+
+
+
+
+
 
     public static Date convertInputToDate(String input) throws ParseException {
         SimpleDateFormat format1 = new SimpleDateFormat("dd/MM/yyyy");
@@ -147,8 +169,8 @@ public class Hotel {
         return target.after(min) && target.before(max);
     }
 
-    public static String[] addElementToArray(String[] baseArray, String element) {
-        String[] newArray = new String[baseArray.length + 1];
+    public static int[] addElementToArray(int[] baseArray, int element) {
+        int[] newArray = new int[baseArray.length + 1];
         System.arraycopy(baseArray, 0, newArray, 0, baseArray.length);
         newArray[baseArray.length] = element;
         return newArray;
@@ -189,12 +211,40 @@ public class Hotel {
         return newArray;
     }
 
-    public static String printsAllElementsOfArray(String[] array) {
+    public static String printsAllElementsOfArray(int[] array) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < array.length - 1; i++) {
             sb.append(array[i]).append(", ");
         }
         sb.append(array[array.length - 1]).append(".");
         return sb.toString();
+    }
+
+    public static int findCapacityOfARoom (int roomNumber){
+        int capacity = 0;
+        if(roomNumber<9){
+            capacity = 1;
+        }
+        if(roomNumber>=9 && roomNumber<16){
+            capacity = 2;
+        }
+        if(roomNumber >= 17 && roomNumber <= 19) {
+            capacity = 3;
+        }
+        if(roomNumber == 16 || roomNumber == 20){
+            capacity = 4;
+        }
+        return capacity;
+    }
+
+    public static int[] findAvailableRooms(int[] startingArray, Date date) throws ParseException {
+        int[] array = startingArray;
+        for (String[] reservation : reservations) {
+            int roomOfReservation = Integer.parseInt(reservation[0]);
+            if (checkIfTargetIsBetweenTwoDates(convertInputToDate(reservation[1]), convertInputToDate(reservation[2]), date)) {
+                array = deleteElementOfArray(array, roomOfReservation);
+            }
+        }
+        return array;
     }
 }
